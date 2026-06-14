@@ -14,7 +14,7 @@ XenoBio matches Earth's extremophile bacteria to space environments (Mars surfac
 - 50 verified peer-reviewed references
 
 ## Live Tool
-https://saherkhalid99-ops.github.io/xenobio
+https://saherkhalid99-ops.github.io/Xenobio/xenobio-v1.html
 
 ## Scientific Basis
 Built from 50 verified peer-reviewed references including Astrobiology, Nature Biotechnology, Science, Applied and Environmental Microbiology, Nature Reviews Microbiology, and NASA technical reports.
@@ -24,13 +24,8 @@ Safia Saher
 MS Biochemistry & Molecular Biology
 COMSATS University Islamabad, Pakistan
 
-Research contact: Dr. Christopher P. McKay
-NASA Ames Research Center
-Space Science & Astrobiology Division
-
 ## Citation
-If you use XenoBio in your research, please cite:
-Saher S (2025). XenoBio: A Decision-Support Tool for Matching Earth's Extremophiles to Space Environments. GitHub. https://saherkhalid99-ops.github.io/xenobio
+Saher S (2025). XenoBio: A Decision-Support Tool for Matching Earth's Extremophiles to Space Environments. GitHub. https://saherkhalid99-ops.github.io/Xenobio/xenobio-v1.html
 
 ## License
 Open access — free for academic and research use
