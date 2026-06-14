@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XenoBio — Extremophile–Space Environment Matching Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --space: #060b14;
+  --deep: #0a1628;
+  --panel: #0e1f38;
+  --card: #112244;
+  --border: #1e3a5f;
+  --cyan: #00d4ff;
+  --cyan2: #00a8cc;
+  --orange: #ff6b35;
+  --gold: #ffd166;
+  --green: #06d6a0;
+  --purple: #9b5de5;
+  --white: #f0f8ff;
+  --text: #c8dff0;
+  --text2: #7aa8cc;
+  --glow: 0 0 20px rgba(0,212,255,0.3);
+  --glow-o: 0 0 20px rgba(255,107,53,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:17px;
+  background:var(--space);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* STARS BACKGROUND */
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 8%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 75%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 85%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 60% 90%, rgba(200,220,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 5%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 5% 50%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 48% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 80%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 20% 95%, rgba(200,220,255,0.5) 0%, transparent 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* HEADER */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(180deg, rgba(0,20,50,0.95) 0%, rgba(6,11,20,0.8) 100%);
+  border-bottom:1px solid var(--border);
+  padding:56px 24px 44px;
+  text-align:center;
+  overflow:hidden;
+}
+header::before{
+  content:'';
+  position:absolute;
+  top:-120px;left:50%;transform:translateX(-50%);
+  width:600px;height:300px;
+  background:radial-gradient(ellipse, rgba(0,212,255,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.mars-icon{
+  font-size:3.5rem;display:block;margin-bottom:12px;
+  filter:drop-shadow(0 0 12px rgba(255,107,53,0.8));
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 12px rgba(255,107,53,0.8));}50%{filter:drop-shadow(0 0 24px rgba(255,107,53,1));}}
+header h1{
+  font-family:'Syne',sans-serif;
+  font-size:3.2rem;font-weight:800;
+  background:linear-gradient(135deg, var(--cyan) 0%, var(--white) 50%, var(--orange) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-1px;margin-bottom:6px;
+}
+.subtitle{
+  font-family:'Space Mono',monospace;
+  font-size:0.85rem;color:var(--cyan2);
+  letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:20px;
+}
+header p.tag{
+  font-size:1.1rem;color:var(--text);
+  max-width:620px;margin:0 auto 32px;
+  line-height:1.6;
+}
+.stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .num{
+  font-family:'Space Mono',monospace;
+  font-size:1.9rem;font-weight:700;
+  color:var(--cyan);display:block;
+  text-shadow:var(--glow);
+}
+.stat .lab{font-size:0.85rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
+
+/* MODE BAR */
+.modebar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(6,11,20,0.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:center;gap:0;
+}
+.mbtn{
+  padding:16px 44px;
+  font-size:1rem;font-weight:600;
+  font-family:'Space Grotesk',sans-serif;
+  border:none;background:transparent;
+  color:var(--text2);cursor:pointer;
+  border-bottom:3px solid transparent;
+  transition:all 0.2s;letter-spacing:0.5px;
+}
+.mbtn.active{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(0,212,255,0.05);}
+.mbtn:hover:not(.active){color:var(--text);background:rgba(255,255,255,0.03);}
+
+/* MAIN */
+main{max-width:1000px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1;}
+
+/* SECTION TITLES */
+.stitle{
+  font-family:'Syne',sans-serif;
+  font-size:1.3rem;font-weight:700;
+  color:var(--cyan);
+  margin-bottom:18px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  letter-spacing:0.5px;
+}
+
+/* ENVIRONMENT CARDS */
+.env-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;margin-bottom:28px;
+}
+@media(max-width:700px){.env-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:440px){.env-grid{grid-template-columns:1fr;}}
+.env-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px 14px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.env-card .eicon{font-size:2.2rem;display:block;margin-bottom:8px;}
+.env-card .ename{font-size:1rem;font-weight:600;color:var(--white);margin-bottom:4px;}
+.env-card .edesc{font-size:0.82rem;color:var(--text2);line-height:1.4;}
+.env-card.active,.env-card:hover{
+  border-color:var(--cyan);
+  background:rgba(0,212,255,0.08);
+  box-shadow:var(--glow);
+}
+.env-card.active .ename{color:var(--cyan);}
+
+/* PURPOSE CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;}
+.chip{
+  padding:10px 20px;border-radius:50px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+  font-family:'Space Grotesk',sans-serif;
+}
+.chip.active,.chip:hover{
+  border-color:var(--orange);
+  background:rgba(255,107,53,0.1);
+  color:var(--orange);
+  box-shadow:var(--glow-o);
+}
+
+/* CONDITION SLIDERS / TOGGLES */
+.cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+@media(max-width:560px){.cond-grid{grid-template-columns:1fr;}}
+.cond-box{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:16px;
+}
+.cond-label{
+  font-family:'Space Mono',monospace;
+  font-size:0.82rem;color:var(--cyan2);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:8px;display:block;
+}
+select.scinput{
+  width:100%;padding:10px 12px;
+  font-size:1rem;font-family:'Space Grotesk',sans-serif;
+  background:var(--deep);color:var(--white);
+  border:1px solid var(--border);border-radius:8px;
+  appearance:auto;cursor:pointer;
+}
+select.scinput:focus{outline:none;border-color:var(--cyan);}
+
+/* CTA */
+.cta{
+  width:100%;padding:20px;
+  font-size:1.2rem;font-weight:700;
+  font-family:'Syne',sans-serif;
+  background:linear-gradient(135deg, #0a3d6b, #0066aa);
+  color:var(--white);border:1px solid var(--cyan);
+  border-radius:12px;cursor:pointer;
+  letter-spacing:1px;text-transform:uppercase;
+  box-shadow:var(--glow);
+  transition:all 0.2s;margin-bottom:36px;
+}
+.cta:hover{
+  background:linear-gradient(135deg, #0d4f8c, #0077cc);
+  box-shadow:0 0 40px rgba(0,212,255,0.5);
+  transform:translateY(-2px);
+}
+
+/* RESULTS */
+.rsec{display:none;margin-bottom:40px;}
+.rsec.show{display:block;}
+
+.rcard{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:26px;margin-bottom:18px;
+  transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.rcard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple),var(--orange));
+}
+.rcard:hover{border-color:var(--cyan);box-shadow:var(--glow);}
+
+.rhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+.rname{
+  font-family:'Syne',sans-serif;
+  font-size:1.3rem;font-weight:700;
+  color:var(--white);font-style:italic;
+}
+.rstrain{
+  font-family:'Space Mono',monospace;
+  font-size:0.82rem;color:var(--cyan2);margin-top:4px;
+}
+.rtype{
+  font-family:'Space Mono',monospace;
+  font-size:0.78rem;color:var(--orange);
+  padding:3px 10px;border-radius:4px;
+  border:1px solid var(--orange);
+  background:rgba(255,107,53,0.1);
+  margin-top:4px;display:inline-block;
+}
+
+.sbadge{
+  font-family:'Space Mono',monospace;
+  font-size:1.4rem;font-weight:700;
+  padding:10px 20px;border-radius:8px;
+  white-space:nowrap;text-align:center;
+  min-width:90px;
+}
+.sbadge.hi{background:rgba(6,214,160,0.15);color:var(--green);border:1px solid var(--green);text-shadow:0 0 10px rgba(6,214,160,0.5);}
+.sbadge.md{background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid var(--cyan);}
+.sbadge.lo{background:rgba(255,209,102,0.1);color:var(--gold);border:1px solid var(--gold);}
+
+/* TRAIT GRID */
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:600px){.tgrid{grid-template-columns:repeat(2,1fr);}}
+.tp{
+  background:var(--deep);
+  border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;
+  font-size:0.85rem;font-weight:600;
+  text-align:center;
+}
+.tp.y{border-color:var(--green);color:var(--green);background:rgba(6,214,160,0.08);}
+.tp.n{border-color:var(--border);color:var(--text2);}
+.tp.u{border-color:#555;color:#888;}
+
+/* EVIDENCE BARS */
+.ev-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.ev-label{font-size:0.82rem;color:var(--text2);min-width:120px;font-family:'Space Mono',monospace;}
+.ev-bar{flex:1;height:8px;background:var(--deep);border-radius:4px;overflow:hidden;}
+.ev-fill{height:100%;border-radius:4px;transition:width 0.8s ease;}
+.ev-fill.hi{background:linear-gradient(90deg,var(--green),var(--cyan));}
+.ev-fill.md{background:linear-gradient(90deg,var(--cyan2),var(--purple));}
+.ev-fill.lo{background:linear-gradient(90deg,var(--gold),var(--orange));}
+
+/* WHY BOX */
+.rwhy{
+  font-size:0.98rem;color:var(--text);line-height:1.7;
+  background:rgba(0,212,255,0.04);
+  padding:14px 16px;border-radius:8px;
+  border-left:3px solid var(--cyan2);
+  margin-bottom:12px;
+}
+
+/* ANALOG BOX */
+.analog-box{
+  background:rgba(155,93,229,0.08);
+  border:1px solid rgba(155,93,229,0.3);
+  border-radius:8px;padding:11px 14px;
+  font-size:0.88rem;color:var(--text);
+  margin-bottom:12px;
+}
+.analog-box strong{color:var(--purple);}
+
+/* RESEARCHER EXTRAS */
+.res-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.stbadge{
+  padding:5px 12px;border-radius:6px;
+  font-size:0.82rem;font-weight:600;
+  font-family:'Space Mono',monospace;
+  background:rgba(0,212,255,0.08);
+  color:var(--cyan);border:1px solid rgba(0,212,255,0.2);
+}
+.rcite{
+  font-family:'Space Mono',monospace;
+  font-size:0.78rem;color:var(--text2);
+  margin-top:8px;
+  padding:8px 12px;
+  background:var(--deep);
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+
+/* FULL TABLE */
+.rtpanel{display:none;margin-bottom:32px;}
+.rtpanel.show{display:block;}
+.tscroll{overflow-x:auto;}
+table.dt{width:100%;border-collapse:collapse;font-size:0.85rem;}
+table.dt th{
+  background:var(--panel);color:var(--cyan);
+  padding:11px 12px;text-align:left;
+  font-family:'Space Mono',monospace;
+  font-size:0.78rem;text-transform:uppercase;
+  letter-spacing:0.5px;border-bottom:1px solid var(--border);
+}
+table.dt td{padding:10px 12px;border-bottom:1px solid rgba(30,58,95,0.5);color:var(--text);vertical-align:top;}
+table.dt tr:hover{background:rgba(0,212,255,0.04);}
+.yt{color:var(--green);font-weight:700;}
+.nt{color:var(--text2);}
+.ut{color:#666;}
+
+/* DISCLAIMER */
+.disc{
+  background:rgba(14,31,56,0.9);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px 28px;margin-bottom:32px;
+  font-size:0.95rem;line-height:1.75;
+  color:var(--text);
+}
+.disc strong{color:var(--cyan);}
+
+/* ENV INFO PANEL */
+.env-info{
+  background:rgba(255,107,53,0.06);
+  border:1px solid rgba(255,107,53,0.2);
+  border-radius:10px;
+  padding:16px 20px;margin-bottom:24px;
+  display:none;
+}
+.env-info.show{display:block;}
+.env-info-title{
+  font-family:'Space Mono',monospace;
+  font-size:0.85rem;color:var(--orange);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:10px;font-weight:700;
+}
+.env-params{display:flex;flex-wrap:wrap;gap:10px;}
+.ep{
+  background:var(--deep);border:1px solid var(--border);
+  border-radius:6px;padding:7px 12px;
+  font-size:0.85rem;
+}
+.ep span{color:var(--text2);font-size:0.78rem;display:block;}
+.ep strong{color:var(--white);}
+
+/* NORES */
+.nores{text-align:center;padding:48px;color:var(--text2);font-size:1.05rem;}
+
+footer{
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  color:var(--text2);text-align:center;
+  padding:24px;font-size:0.9rem;line-height:1.7;
+  position:relative;z-index:1;
+}
+footer strong{color:var(--cyan);}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="mars-icon">🔴</span>
+  <h1>XenoBio</h1>
+  <div class="subtitle">Extremophile × Space Environment Matching System</div>
+  <p class="tag">Which Earth bacteria could survive — and work — on Mars? Select a space environment and purpose. XenoBio ranks your best microbial candidates from published astrobiology literature.</p>
+  <div class="stats">
+    <div class="stat"><span class="num">30</span><span class="lab">Extremophile Strains</span></div>
+    <div class="stat"><span class="num">8</span><span class="lab">Space Environments</span></div>
+    <div class="stat"><span class="num">50</span><span class="lab">Verified References</span></div>
+    <div class="stat"><span class="num">Natural+Engineered</span><span class="lab">Strain Coverage</span></div>
+  </div>
+</header>
+
+<div class="modebar">
+  <button class="mbtn active" onclick="setMode('explorer')">🚀 Explorer Mode</button>
+  <button class="mbtn" onclick="setMode('researcher')">🔬 Researcher Mode</button>
+</div>
+
+<main>
+
+<!-- DISCLAIMER -->
+<div class="disc">
+  <strong>📋 Scientific Basis:</strong> All strain data in XenoBio is extracted from peer-reviewed astrobiology, microbiology, and planetary science literature including <em>Astrobiology</em>, <em>Nature Biotechnology</em>, <em>Applied and Environmental Microbiology</em>, <em>Science</em>, and NASA technical reports. Mars environment parameters are derived from Phoenix Lander, Curiosity Rover, and Mars Reconnaissance Orbiter mission data. Matching scores reflect published experimental evidence — not theoretical predictions. This tool is a knowledge synthesis resource for researchers and mission planners.<br><br>
+  <strong>Developed by Safia Saher</strong> (MS Biochemistry &amp; Molecular Biology, COMSATS University Islamabad) in collaboration with research on perchlorate-reducing PGPR bacteria for Mars agriculture. Affiliated research contact: Dr. Christopher P. McKay, NASA Ames Research Center, Space Science &amp; Astrobiology Division.
+</div>
+
+<!-- STEP 1: ENVIRONMENT -->
+<div class="stitle">🪐 Step 1 — Select Space Environment</div>
+<div class="env-grid" id="envGrid">
+  <div class="env-card" onclick="pickEnv('mars_eq_day',this)">
+    <span class="eicon">🌅</span>
+    <div class="ename">Mars Equatorial Day</div>
+    <div class="edesc">−5°C to +20°C · Extreme UV · High perchlorate · Low pressure</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('mars_eq_night',this)">
+    <span class="eicon">🌑</span>
+    <div class="ename">Mars Equatorial Night</div>
+    <div class="edesc">−80°C to −40°C · No UV · High perchlorate · 0.6 kPa</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('mars_polar',this)">
+    <span class="eicon">❄️</span>
+    <div class="ename">Mars Polar Region</div>
+    <div class="edesc">−143°C to −60°C · Perchlorate brine · CO₂ ice · Extreme cold</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('mars_subsurface',this)">
+    <span class="eicon">🕳️</span>
+    <div class="ename">Mars Subsurface</div>
+    <div class="edesc">−20°C to +5°C · No UV · Brine pockets · Shielded radiation</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('mars_habitat',this)">
+    <span class="eicon">🏠</span>
+    <div class="ename">Pressurized Habitat</div>
+    <div class="edesc">+18°C to +24°C · Controlled · Mars regolith substrate · ISRU focus</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('mars_simulant',this)">
+    <span class="eicon">🧪</span>
+    <div class="ename">Lab / Mars Simulant</div>
+    <div class="edesc">Earth lab conditions · Palagonite/MMS simulant · Controlled experiments</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('lunar',this)">
+    <span class="eicon">🌕</span>
+    <div class="ename">Lunar Surface</div>
+    <div class="edesc">−173°C to +127°C · Vacuum · No atmosphere · Extreme radiation</div>
+  </div>
+  <div class="env-card" onclick="pickEnv('iss',this)">
+    <span class="eicon">🛰️</span>
+    <div class="ename">ISS / Low Earth Orbit</div>
+    <div class="edesc">Microgravity · Radiation · EXPOSE/BIOMEX conditions · Vacuum</div>
+  </div>
+</div>
+
+<!-- ENV PARAMETERS DISPLAY -->
+<div class="env-info" id="envInfo">
+  <div class="env-info-title" id="envInfoTitle">Environment Parameters</div>
+  <div class="env-params" id="envParams"></div>
+</div>
+
+<!-- STEP 2: PURPOSE -->
+<div class="stitle">🎯 Step 2 — Select Research Purpose</div>
+<div class="chips" id="purposeChips">
+  <span class="chip" onclick="togglePurpose('perchlorate',this)">⚗️ Perchlorate Bioremediation</span>
+  <span class="chip" onclick="togglePurpose('agriculture',this)">🌱 Space Agriculture (PGPR)</span>
+  <span class="chip" onclick="togglePurpose('nitrogen',this)">🌿 Nitrogen Fixation</span>
+  <span class="chip" onclick="togglePurpose('radiation',this)">☢️ Radiation Resistance</span>
+  <span class="chip" onclick="togglePurpose('desiccation',this)">💧 Desiccation Tolerance</span>
+  <span class="chip" onclick="togglePurpose('isru',this)">🏭 ISRU / Life Support</span>
+</div>
+
+<!-- STEP 3: CONDITIONS -->
+<div class="stitle">🧬 Step 3 — Refine Conditions</div>
+<div class="cond-grid">
+  <div class="cond-box">
+    <span class="cond-label">Strain Type</span>
+    <select class="scinput" id="strainType">
+      <option value="all">All strains (natural + engineered)</option>
+      <option value="natural">Natural strains only</option>
+      <option value="engineered">Engineered strains only</option>
+    </select>
+  </div>
+  <div class="cond-box">
+    <span class="cond-label">Evidence Level</span>
+    <select class="scinput" id="evidLevel">
+      <option value="all">All evidence levels</option>
+      <option value="high">High evidence only</option>
+      <option value="medium">Medium + High</option>
+    </select>
+  </div>
+</div>
+
+<button class="cta" onclick="findStrains()">🔭 FIND MATCHING EXTREMOPHILES</button>
+
+<!-- RESEARCHER FULL TABLE -->
+<div class="rtpanel" id="rtpanel">
+  <div class="stitle">🔬 Complete Strain Database</div>
+  <p style="margin-bottom:16px;color:var(--text2);font-size:0.95rem;">All 30 strains with full trait data extracted from peer-reviewed literature. Citations shown per strain for independent verification.</p>
+  <div class="tscroll">
+    <table class="dt" id="fullTable">
+      <thead>
+        <tr>
+          <th>Species</th><th>Strain</th><th>Type</th>
+          <th>PRB</th><th>Rad</th><th>UV</th><th>Desic</th><th>Cold</th><th>Halo</th>
+          <th>IAA</th><th>N-Fix</th><th>P-Sol</th>
+          <th>Temp Range</th><th>Earth Analog</th><th>Evidence</th><th>Refs</th>
+        </tr>
+      </thead>
+      <tbody id="fullTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="rsec" id="rsec">
+  <div class="stitle">🧬 Matched Extremophile Strains</div>
+  <div id="rcon"></div>
+</div>
+
+</main>
+
+<footer>
+  Based on 50 peer-reviewed references from <em>Astrobiology</em>, <em>Nature Biotechnology</em>, <em>Science</em>, <em>AEM</em>, <em>Nature Reviews Microbiology</em>, and NASA technical reports<br>
+  <strong>XenoBio v1.0 · Developed by Safia Saher · MS Biochemistry &amp; Molecular Biology · COMSATS University Islamabad</strong><br>
+  Research contact: Dr. Christopher P. McKay · NASA Ames Research Center · Space Science &amp; Astrobiology Division
+</footer>
+
+<script>
+// ===================== ENVIRONMENT DATA =====================
+const ENVS = {
+  mars_eq_day:{
+    name:"Mars Equatorial Day",icon:"🌅",
+    temp_min:-5,temp_max:20,uv:"extreme",rad:"high",perchlorate:1.0,
+    pressure:0.006,water:"ice/brine",co2:95.3,
+    params:[
+      {l:"Temperature",v:"-5°C to +20°C"},
+      {l:"UV Level",v:"Extreme (50× Earth)"},
+      {l:"Radiation",v:"High (0.2 mGy/day)"},
+      {l:"Perchlorate",v:"0.5–1.0%"},
+      {l:"Pressure",v:"0.6 kPa"},
+      {l:"Water",v:"Ice / Brine traces"},
+      {l:"Atmosphere",v:"95.3% CO₂"}
+    ]
+  },
+  mars_eq_night:{
+    name:"Mars Equatorial Night",icon:"🌑",
+    temp_min:-80,temp_max:-40,uv:"none",rad:"high",perchlorate:1.0,
+    pressure:0.006,water:"ice",co2:95.3,
+    params:[
+      {l:"Temperature",v:"-80°C to -40°C"},
+      {l:"UV Level",v:"None (night)"},
+      {l:"Radiation",v:"High (GCR)"},
+      {l:"Perchlorate",v:"0.5–1.0%"},
+      {l:"Pressure",v:"0.6 kPa"},
+      {l:"Water",v:"Ice only"},
+      {l:"Atmosphere",v:"95.3% CO₂"}
+    ]
+  },
+  mars_polar:{
+    name:"Mars Polar Region",icon:"❄️",
+    temp_min:-143,temp_max:-60,uv:"moderate",rad:"moderate",perchlorate:1.5,
+    pressure:0.006,water:"brine/ice",co2:95.3,
+    params:[
+      {l:"Temperature",v:"-143°C to -60°C"},
+      {l:"UV Level",v:"Moderate (seasonal)"},
+      {l:"Radiation",v:"Moderate (GCR)"},
+      {l:"Perchlorate",v:"1.0–1.5%"},
+      {l:"Pressure",v:"0.6 kPa"},
+      {l:"Water",v:"Perchlorate brine / CO₂ ice"},
+      {l:"Atmosphere",v:"95.3% CO₂"}
+    ]
+  },
+  mars_subsurface:{
+    name:"Mars Subsurface",icon:"🕳️",
+    temp_min:-20,temp_max:5,uv:"none",rad:"low",perchlorate:0.5,
+    pressure:1.0,water:"brine",co2:95.3,
+    params:[
+      {l:"Temperature",v:"-20°C to +5°C"},
+      {l:"UV Level",v:"None (shielded)"},
+      {l:"Radiation",v:"Low (rock shielded)"},
+      {l:"Perchlorate",v:"0.3–0.5%"},
+      {l:"Pressure",v:"~1 atm (rock pressure)"},
+      {l:"Water",v:"Possible brine pockets"},
+      {l:"Atmosphere",v:"CO₂ dominated"}
+    ]
+  },
+  mars_habitat:{
+    name:"Pressurized Habitat",icon:"🏠",
+    temp_min:18,temp_max:24,uv:"none",rad:"low",perchlorate:0.3,
+    pressure:101,water:"liquid",co2:0.04,
+    params:[
+      {l:"Temperature",v:"+18°C to +24°C"},
+      {l:"UV Level",v:"None (shielded)"},
+      {l:"Radiation",v:"Low (habitat shielded)"},
+      {l:"Perchlorate",v:"Residual 0.1–0.3%"},
+      {l:"Pressure",v:"~1 atm (controlled)"},
+      {l:"Water",v:"Liquid available"},
+      {l:"Substrate",v:"Mars regolith / simulant"}
+    ]
+  },
+  mars_simulant:{
+    name:"Mars Simulant Lab",icon:"🧪",
+    temp_min:15,temp_max:30,uv:"variable",rad:"variable",perchlorate:0.5,
+    pressure:101,water:"liquid",co2:0.04,
+    params:[
+      {l:"Temperature",v:"+15°C to +30°C"},
+      {l:"Simulant",v:"Palagonite / MMS-1 / MGS-1"},
+      {l:"Perchlorate",v:"0.5% (spiked)"},
+      {l:"Pressure",v:"1 atm (Earth lab)"},
+      {l:"Water",v:"Controlled"},
+      {l:"Reference",v:"Hecht et al. 2009 [11]"}
+    ]
+  },
+  lunar:{
+    name:"Lunar Surface",icon:"🌕",
+    temp_min:-173,temp_max:127,uv:"extreme",rad:"extreme",perchlorate:0,
+    pressure:0,water:"ice_poles",co2:0,
+    params:[
+      {l:"Temperature",v:"-173°C to +127°C"},
+      {l:"UV Level",v:"Extreme (unfiltered)"},
+      {l:"Radiation",v:"Extreme (no magnetosphere)"},
+      {l:"Atmosphere",v:"Vacuum"},
+      {l:"Water",v:"Ice at poles only"},
+      {l:"Pressure",v:"~0 (vacuum)"}
+    ]
+  },
+  iss:{
+    name:"ISS / Low Earth Orbit",icon:"🛰️",
+    temp_min:-20,temp_max:50,uv:"extreme",rad:"high",perchlorate:0,
+    pressure:101,water:"liquid",co2:0.4,
+    params:[
+      {l:"Temperature",v:"-20°C to +50°C (cycling)"},
+      {l:"UV Level",v:"Extreme (unfiltered solar)"},
+      {l:"Radiation",v:"High (0.5–1 mGy/day GCR+SAA)"},
+      {l:"Pressure",v:"1 atm (inside) / Vacuum (outside)"},
+      {l:"Experiments",v:"BIOMEX, EXPOSE-R2 [48,49]"},
+      {l:"Gravity",v:"Microgravity"}
+    ]
+  }
+};
+
+// ===================== STRAIN DATABASE =====================
+const STRAINS = [
+  {
+    id:1,sp:"Pseudomonas stutzeri",st:"PDA",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:1,halo:0,iaa:1,nfix:1,psol:1,
+    temp_min:-5,temp_max:37,
+    envs:["mars_eq_day","mars_eq_night","mars_subsurface","mars_habitat","mars_simulant"],
+    purposes:["perchlorate","agriculture","nitrogen"],
+    evidence:"high",
+    analog:"Semi-arid soils, wastewater treatment plants",
+    why:"Carries pcrAB and cld genes for complete perchlorate reduction pathway. Also produces IAA and fixes nitrogen — dual perchlorate remediator and plant growth promoter. Clark et al. [4] fully characterized chlorate respiration. Key candidate for Dr. McKay's dual-function hypothesis.",
+    eng_note:null,
+    refs:["[4]","[9]","[32]"]
+  },
+  {
+    id:2,sp:"Dechloromonas agitata",st:"CKB",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:4,temp_max:37,
+    envs:["mars_habitat","mars_simulant","mars_subsurface"],
+    purposes:["perchlorate"],
+    evidence:"high",
+    analog:"Freshwater sediments, USA",
+    why:"Type strain for perchlorate-reducing Dechloromonas genus. Achenbach et al. [3] originally described this genus. Obligate perchlorate reducer; strong candidate for Mars regolith bioremediation in habitat conditions.",
+    eng_note:null,
+    refs:["[3]","[1]","[9]"]
+  },
+  {
+    id:3,sp:"Azospira suillum",st:"PS",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:1,nfix:1,psol:0,
+    temp_min:4,temp_max:37,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate","agriculture","nitrogen"],
+    evidence:"high",
+    analog:"Freshwater and soil environments",
+    why:"Perchlorate reducer with documented nitrogen fixation. Dual function relevant to McKay hypothesis. Coates et al. [2] documented ubiquitous presence of PRB including Azospira in diverse environments.",
+    eng_note:null,
+    refs:["[3]","[2]","[9]"]
+  },
+  {
+    id:4,sp:"Acinetobacter bereziniae",st:"GWF",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:1,nfix:0,psol:1,
+    temp_min:10,temp_max:37,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate","agriculture"],
+    evidence:"high",
+    analog:"Contaminated groundwater, bioreactor communities",
+    why:"Confirmed perchlorate reducer with IAA and phosphate solubilization traits. Zhang et al. [5] confirmed PRB activity. Barnum et al. [5] genome-resolved metagenomics confirmed metabolic interactions in PRB communities.",
+    eng_note:null,
+    refs:["[5]","[6]","[9]"]
+  },
+  {
+    id:5,sp:"Dechlorobacter hydrogenophilus",st:"MPT",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:5,temp_max:40,
+    envs:["mars_habitat","mars_simulant","mars_subsurface"],
+    purposes:["perchlorate"],
+    evidence:"high",
+    analog:"Hydrogen-rich subsurface environments",
+    why:"Novel perchlorate-reducing genus described by Thrash et al. [8]. Uses H₂ as electron donor — relevant for Mars subsurface where H₂ may be available from geochemical reactions.",
+    eng_note:null,
+    refs:["[8]","[1]","[7]"]
+  },
+  {
+    id:6,sp:"Planococcus halocryophilus",st:"Or1",type:"natural",
+    prb:0,rad:0,uv:0,desic:1,cold:1,halo:1,iaa:0,nfix:0,psol:0,
+    temp_min:-25,temp_max:25,
+    envs:["mars_polar","mars_eq_night","mars_subsurface"],
+    purposes:["desiccation"],
+    evidence:"high",
+    analog:"Canadian High Arctic permafrost",
+    why:"Grows at −25°C in perchlorate brine — the only strain confirmed to grow under Mars polar-analog conditions. Heinz et al. [31] documented growth in chloride and perchlorate brines. Most Mars-relevant psychrophile in the literature.",
+    eng_note:null,
+    refs:["[31]","[15]","[16]"]
+  },
+  {
+    id:7,sp:"Chroococcidiopsis sp.",st:"029 / CCMEE 029",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:5,temp_max:45,
+    envs:["mars_eq_day","mars_subsurface","iss","mars_simulant"],
+    purposes:["radiation","desiccation","nitrogen","isru"],
+    evidence:"high",
+    analog:"Atacama Desert, Negev Desert, Antarctic rocks",
+    why:"Most radiation and desiccation resistant cyanobacterium known. Billi et al. [17] confirmed ionizing radiation resistance. Cockell et al. [20] tested under simulated Mars UV. Survived BIOMEX ISS experiment [48]. Fixes nitrogen and produces O₂ — critical ISRU organism.",
+    eng_note:null,
+    refs:["[17]","[20]","[25]","[48]"]
+  },
+  {
+    id:8,sp:"Deinococcus radiodurans",st:"R1",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:5,temp_max:45,
+    envs:["mars_eq_day","iss","lunar","mars_subsurface"],
+    purposes:["radiation"],
+    evidence:"high",
+    analog:"Irradiated meat, soil worldwide",
+    why:"Most radiation-resistant bacterium known. Survives 1.5 MGy ionizing radiation. Musilova et al. [23] isolated radiation-resistant bacteria from Antarctic Mars analogs. Base chassis for engineered strains [26,27,29].",
+    eng_note:null,
+    refs:["[23]","[16]","[26]"]
+  },
+  {
+    id:9,sp:"Halobacterium salinarum",st:"NRC-1",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:1,iaa:0,nfix:0,psol:0,
+    temp_min:20,temp_max:55,
+    envs:["mars_eq_day","mars_subsurface","iss"],
+    purposes:["radiation","desiccation"],
+    evidence:"high",
+    analog:"Dead Sea, Great Salt Lake, salt flats",
+    why:"Halophilic archaeon with extreme UV and ionizing radiation resistance. Leuko et al. [21,22] confirmed resistance to simulated outer space solar radiation and HZE particles. Retinal-based photosynthesis relevant to low-light Mars conditions.",
+    eng_note:null,
+    refs:["[21]","[22]","[42]"]
+  },
+  {
+    id:10,sp:"Haloferax mediterranei",st:"ATCC 33500",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:1,iaa:0,nfix:0,psol:0,
+    temp_min:20,temp_max:50,
+    envs:["mars_subsurface","mars_habitat","mars_simulant"],
+    purposes:["perchlorate"],
+    evidence:"high",
+    analog:"Mediterranean salterns, saline lakes",
+    why:"Halophilic archaeon with confirmed (per)chlorate reduction. Martínez-Espinosa et al. [41] documented nitrate and nitrite removal. Combines halophily with perchlorate metabolism — relevant for Mars subsurface brine environments.",
+    eng_note:null,
+    refs:["[41]","[42]","[43]"]
+  },
+  {
+    id:11,sp:"Halococcus dombrowskii",st:"DSM 14522",type:"natural",
+    prb:0,rad:0,uv:1,desic:1,cold:0,halo:1,iaa:0,nfix:0,psol:0,
+    temp_min:20,temp_max:50,
+    envs:["mars_eq_day","mars_subsurface"],
+    purposes:["radiation","desiccation"],
+    evidence:"high",
+    analog:"Ancient salt deposits, Dead Sea",
+    why:"Fendrihan et al. [44] documented survival under simulated Martian UV radiation. Ancient salt isolate suggesting long-term viability. Combines halophily with UV resistance relevant to Mars surface.",
+    eng_note:null,
+    refs:["[44]","[42]","[43]"]
+  },
+  {
+    id:12,sp:"Nostoc sp.",st:"HK-01",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:-10,temp_max:40,
+    envs:["mars_eq_day","iss","mars_simulant"],
+    purposes:["radiation","nitrogen","isru","desiccation"],
+    evidence:"high",
+    analog:"Antarctic desert soil, biological soil crusts",
+    why:"Nitrogen-fixing cyanobacterium tested on ISS in EXPOSE-R2 [49]. Survived outer space conditions. Critical ISRU organism — fixes N₂ and produces O₂. Santi et al. [45] reviewed N-fixation in non-legumes.",
+    eng_note:null,
+    refs:["[49]","[45]","[48]"]
+  },
+  {
+    id:13,sp:"Anabaena cylindrica",st:"ATCC 29414",type:"natural",
+    prb:0,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:10,temp_max:35,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["nitrogen","agriculture","isru"],
+    evidence:"high",
+    analog:"Freshwater, soil",
+    why:"Classic nitrogen-fixing cyanobacterium. Verseux et al. [19] specifically recommended cyanobacteria including Anabaena for sustainable Mars life support. Produces O₂ and fixed nitrogen simultaneously.",
+    eng_note:null,
+    refs:["[19]","[45]","[47]"]
+  },
+  {
+    id:14,sp:"Pseudomonas extremaustralis",st:"IB-KI3-IA",type:"natural",
+    prb:0,rad:0,uv:0,desic:0,cold:1,halo:0,iaa:1,nfix:1,psol:1,
+    temp_min:-10,temp_max:25,
+    envs:["mars_polar","mars_eq_night","mars_subsurface","mars_simulant"],
+    purposes:["agriculture","nitrogen"],
+    evidence:"high",
+    analog:"Antarctic soil, sub-zero environments",
+    why:"Cold-active PGPR with IAA, nitrogen fixation and phosphate solubilization at sub-zero temperatures. Kudoyarova et al. [32] confirmed PGPR traits. Relevant for cold Mars conditions combined with plant growth support.",
+    eng_note:null,
+    refs:["[32]","[35]","[34]"]
+  },
+  {
+    id:15,sp:"Pantoea dispersa",st:"1A",type:"natural",
+    prb:0,rad:0,uv:0,desic:0,cold:1,halo:0,iaa:1,nfix:0,psol:1,
+    temp_min:-4,temp_max:28,
+    envs:["mars_subsurface","mars_habitat","mars_simulant"],
+    purposes:["agriculture"],
+    evidence:"high",
+    analog:"Sub-alpine Himalayan soil (2000m+), cold deserts",
+    why:"Cold-tolerant PGPR from extreme Himalayan altitude. Selvakumar et al. [33] documented phosphate solubilization and IAA at 4°C. Cold-active analog for Mars subsurface agriculture support.",
+    eng_note:null,
+    refs:["[33]","[36]","[37]"]
+  },
+  {
+    id:16,sp:"Deinococcus geothermalis",st:"ATCC 43004",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:30,temp_max:60,
+    envs:["mars_eq_day","iss","lunar"],
+    purposes:["radiation"],
+    evidence:"high",
+    analog:"Geothermal springs, hot environments",
+    why:"Thermophilic Deinococcus with extreme radiation resistance. Brim et al. [27] engineered for bioremediation at high temperature. Musilova et al. [23] radiation-resistance context. Chassis for high-temperature Mars analog engineering.",
+    eng_note:null,
+    refs:["[27]","[23]","[16]"]
+  },
+  {
+    id:17,sp:"Bacillus subtilis",st:"168 + pcrAB+cld",type:"engineered",
+    prb:1,rad:0,uv:0,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:1,
+    temp_min:5,temp_max:55,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate","isru"],
+    evidence:"high",
+    analog:"Engineered — chassis from ubiquitous soil bacteria",
+    why:"NASA NIAC-funded engineered strain with pcrAB and cld genes inserted into robust Bacillus chassis. Hall/NASA [28] documented this as primary approach to Mars perchlorate detoxification. Spore-forming ensures long-term viability in storage and transport.",
+    eng_note:"Engineered: pcrAB + cld genes from natural PRB inserted into B. subtilis 168",
+    refs:["[28]","[7]","[30]"]
+  },
+  {
+    id:18,sp:"Deinococcus radiodurans",st:"R1 + mer operon",type:"engineered",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:5,temp_max:45,
+    envs:["mars_eq_day","iss","lunar"],
+    purposes:["radiation","isru"],
+    evidence:"high",
+    analog:"Engineered from R1 natural strain",
+    why:"Brim et al. [26] engineered for mercury bioremediation in radioactive waste. Lange et al. [29] engineered for organopollutant degradation. Demonstrates that Deinococcus chassis tolerates engineering without losing radiation resistance.",
+    eng_note:"Engineered: mer operon / toluene degradation genes inserted into radiation-resistant chassis",
+    refs:["[26]","[29]","[27]"]
+  },
+  {
+    id:19,sp:"Cupriavidus pinatubonensis",st:"JMP134 + enhanced pcrA",type:"engineered",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:10,temp_max:37,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate"],
+    evidence:"medium",
+    analog:"Engineered from soil degrader",
+    why:"Broad metabolic versatility as chassis for enhanced perchlorate reduction. Wang & Coates [9] reviewed biotechnological applications of PRB. Melnyk et al. [7] genomic island work directly applicable to this chassis.",
+    eng_note:"Engineered: enhanced perchlorate reductase expression via genomic island transfer [7]",
+    refs:["[9]","[7]","[6]"]
+  },
+  {
+    id:20,sp:"Synechococcus elongatus",st:"PCC 7942 + enhanced N-fix",type:"engineered",
+    prb:0,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:15,temp_max:40,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["nitrogen","isru","agriculture"],
+    evidence:"medium",
+    analog:"Engineered from freshwater cyanobacterium",
+    why:"Fast-growing cyanobacterium engineered for enhanced nitrogen fixation and resource extraction. Menezes et al. [47] specifically described synthetic biological approaches to resource utilization on space missions including cyanobacteria.",
+    eng_note:"Engineered: nif gene cluster enhancement for improved N-fixation under low light",
+    refs:["[47]","[19]","[45]"]
+  },
+  {
+    id:21,sp:"Chroococcidiopsis sp.",st:"CCMEE 029 + UV shield",type:"engineered",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:5,temp_max:45,
+    envs:["mars_eq_day","iss","lunar"],
+    purposes:["radiation","desiccation","nitrogen","isru"],
+    evidence:"medium",
+    analog:"Engineered from desert cyanobacterium",
+    why:"Billi et al. [25] documented desert cyanobacterium under simulated Mars conditions. Enhanced UV shielding via scytonemin pathway engineering extends surface survivability. Fagliarone et al. [24] confirmed protein oxidation avoidance mechanism.",
+    eng_note:"Engineered: enhanced scytonemin (UV-screen pigment) production pathway",
+    refs:["[25]","[24]","[17]"]
+  },
+  {
+    id:22,sp:"Bacillus pumilus",st:"SAFR-032",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:-10,temp_max:50,
+    envs:["mars_eq_day","iss","lunar"],
+    purposes:["radiation","desiccation"],
+    evidence:"high",
+    analog:"NASA spacecraft assembly cleanroom",
+    why:"Isolated from spacecraft assembly facilities; survived NASA spacecraft sterilization protocols. Extreme UV and desiccation resistance. Horneck et al. [16] reviewed space microbiology including cleanroom isolates. ISS survival documented.",
+    eng_note:null,
+    refs:["[16]","[23]","[48]"]
+  },
+  {
+    id:23,sp:"Tersicoccus phoenicis",st:"Cr55",type:"natural",
+    prb:0,rad:1,uv:1,desic:1,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:10,temp_max:40,
+    envs:["mars_eq_day","iss"],
+    purposes:["radiation","desiccation"],
+    evidence:"medium",
+    analog:"Spacecraft assembly cleanroom (JPL + ESA)",
+    why:"Novel genus isolated simultaneously from NASA JPL and ESA cleanrooms. Extreme radiation and desiccation resistance qualifying it for spacecraft contamination studies and Mars analog research. Horneck et al. [16] space microbiology framework.",
+    eng_note:null,
+    refs:["[16]","[23]","[49]"]
+  },
+  {
+    id:24,sp:"Pseudomonas sp.",st:"Antarctica PGPR strains",type:"natural",
+    prb:0,rad:0,uv:0,desic:0,cold:1,halo:0,iaa:1,nfix:0,psol:1,
+    temp_min:-15,temp_max:20,
+    envs:["mars_polar","mars_eq_night","mars_subsurface","mars_simulant"],
+    purposes:["agriculture"],
+    evidence:"high",
+    analog:"Antarctic soil and ice-free valleys",
+    why:"Styczynski et al. [35] documented psychrotolerant Antarctic bacteria as plant growth promoters. IAA and phosphate solubilization active at subzero temperatures. Directly relevant for cold Mars agriculture in habitat conditions.",
+    eng_note:null,
+    refs:["[35]","[34]","[33]"]
+  },
+  {
+    id:25,sp:"Halococcus morrhuae",st:"DSM 1307",type:"natural",
+    prb:0,rad:0,uv:1,desic:1,cold:0,halo:1,iaa:0,nfix:0,psol:0,
+    temp_min:20,temp_max:50,
+    envs:["mars_subsurface","mars_eq_day"],
+    purposes:["desiccation","radiation"],
+    evidence:"high",
+    analog:"Dead Sea, solar salt evaporation ponds",
+    why:"Leuko et al. [21] confirmed resistance to simulated outer space solar radiation. Halophilic archaeon surviving combined UV and desiccation stress. Relevant for Mars subsurface brine pockets.",
+    eng_note:null,
+    refs:["[21]","[44]","[42]"]
+  },
+  {
+    id:26,sp:"Magnetospirillum sp.",st:"VDYT",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:10,temp_max:37,
+    envs:["mars_subsurface","mars_habitat","mars_simulant"],
+    purposes:["perchlorate"],
+    evidence:"medium",
+    analog:"Freshwater sediments, redox transition zones",
+    why:"Perchlorate-reducing bacterium in the Coates lab collection [1,2]. Relevant for Mars subsurface redox environments where perchlorate reduction coupled to iron cycling may be possible.",
+    eng_note:null,
+    refs:["[1]","[2]","[9]"]
+  },
+  {
+    id:27,sp:"Anabaena sp.",st:"ATCC 33047 + pcrAB",type:"engineered",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:1,psol:0,
+    temp_min:10,temp_max:35,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate","nitrogen","isru"],
+    evidence:"medium",
+    analog:"Engineered from freshwater N-fixing cyanobacterium",
+    why:"Triple-function engineered strain — nitrogen fixation + O₂ production + perchlorate reduction. Combines Verseux et al. [19] cyanobacteria ISRU concept with Rothschild [30] synthetic biology for Mars approach. Theoretical but supported by component evidence.",
+    eng_note:"Engineered: pcrAB genes transferred into nitrogen-fixing Anabaena chassis",
+    refs:["[19]","[30]","[9]"]
+  },
+  {
+    id:28,sp:"Barnum community PRB",st:"Metagenome-assembled",type:"natural",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:5,temp_max:40,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate"],
+    evidence:"medium",
+    analog:"Perchlorate-contaminated bioreactors",
+    why:"Barnum et al. [5] genome-resolved metagenomics revealed unexpected PRB diversity and metabolic interactions. Community-level perchlorate reduction may be more robust than single strains for Mars bioreactor systems.",
+    eng_note:null,
+    refs:["[5]","[7]","[9]"]
+  },
+  {
+    id:29,sp:"Pseudomonas putida",st:"GR12-2 + perchlorate genes",type:"engineered",
+    prb:1,rad:0,uv:0,desic:0,cold:1,halo:0,iaa:1,nfix:0,psol:1,
+    temp_min:-5,temp_max:30,
+    envs:["mars_habitat","mars_simulant","mars_subsurface"],
+    purposes:["perchlorate","agriculture"],
+    evidence:"medium",
+    analog:"Engineered from cold-tolerant soil PGPR",
+    why:"Cold-tolerant PGPR chassis with ACC deaminase and IAA production. Glick [39] extensively documented ACC deaminase PGPR. Adding perchlorate reduction creates dual-function strain directly aligned with McKay hypothesis of simultaneous bioremediation and plant support.",
+    eng_note:"Engineered: pcrAB genes transferred to create dual perchlorate + PGPR function",
+    refs:["[39]","[40]","[9]"]
+  },
+  {
+    id:30,sp:"Chlorite dismutase-overexpressing E. coli",st:"Cld-OE",type:"engineered",
+    prb:1,rad:0,uv:0,desic:0,cold:0,halo:0,iaa:0,nfix:0,psol:0,
+    temp_min:15,temp_max:42,
+    envs:["mars_habitat","mars_simulant"],
+    purposes:["perchlorate","isru"],
+    evidence:"medium",
+    analog:"Engineered laboratory strain",
+    why:"Chlorite dismutase (Cld) is the enzyme that converts toxic chlorite to Cl⁻ + O₂ — generating oxygen as byproduct of perchlorate reduction. Dassama et al. [50] characterized the Cld mechanism. O₂ generation from Mars perchlorate via Cld is an ISRU opportunity.",
+    eng_note:"Engineered: cld gene overexpression for O₂ generation from Mars perchlorate",
+    refs:["[50]","[6]","[28]"]
+  }
+];
+
+// ===================== STATE =====================
+let selEnv=null, selPurposes=[], curMode='explorer';
+
+function init(){buildFullTable();}
+
+function pickEnv(env,el){
+  selEnv=env;
+  document.querySelectorAll('.env-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  showEnvInfo(env);
+}
+
+function showEnvInfo(env){
+  const e=ENVS[env];
+  const panel=document.getElementById('envInfo');
+  document.getElementById('envInfoTitle').textContent=e.icon+' '+e.name+' — Confirmed Parameters';
+  document.getElementById('envParams').innerHTML=e.params.map(p=>
+    `<div class="ep"><span>${p.l}</span><strong>${p.v}</strong></div>`
+  ).join('');
+  panel.classList.add('show');
+}
+
+function togglePurpose(p,el){
+  if(selPurposes.includes(p)){selPurposes=selPurposes.filter(x=>x!==p);el.classList.remove('active');}
+  else{selPurposes.push(p);el.classList.add('active');}
+}
+
+function setMode(mode){
+  curMode=mode;
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  const panel=document.getElementById('rtpanel');
+  panel.classList.toggle('show',mode==='researcher');
+}
+
+// ===================== SCORING =====================
+function scoreStrain(s,env,purposes,strainType,evidLevel){
+  if(!ENVS[env]) return 0;
+  const e=ENVS[env];
+  if(strainType==='natural'&&s.type==='engineered') return -1;
+  if(strainType==='engineered'&&s.type==='natural') return -1;
+  if(evidLevel==='high'&&s.evidence!=='high') return -1;
+  if(evidLevel==='medium'&&s.evidence==='low') return -1;
+  if(!s.envs.includes(env)) return -1;
+
+  let sc=0;
+
+  // Temperature 30pts
+  const envTempMid=(e.temp_min+e.temp_max)/2;
+  if(s.temp_min<=e.temp_min&&s.temp_max>=e.temp_max) sc+=30;
+  else if(s.temp_min<=envTempMid&&s.temp_max>=envTempMid) sc+=18;
+  else sc+=5;
+
+  // Perchlorate 20pts
+  if(e.perchlorate>0){
+    if(s.prb) sc+=20;
+    else sc+=0;
+  } else sc+=10;
+
+  // UV 15pts
+  if(e.uv==='extreme'){if(s.uv) sc+=15; else sc+=0;}
+  else if(e.uv==='high'){if(s.uv) sc+=10; else sc+=3;}
+  else if(e.uv==='moderate'){if(s.uv) sc+=8; else sc+=5;}
+  else sc+=8;
+
+  // Radiation 10pts
+  if(e.rad==='extreme'){if(s.rad) sc+=10; else sc+=0;}
+  else if(e.rad==='high'){if(s.rad) sc+=8; else sc+=2;}
+  else sc+=5;
+
+  // Purpose match bonus 20pts
+  if(purposes.length>0){
+    const matched=purposes.filter(p=>s.purposes.includes(p)).length;
+    sc+=Math.round((matched/purposes.length)*20);
+  } else sc+=10;
+
+  // Trait bonus 5pts
+  if(s.iaa||s.nfix||s.psol) sc+=5;
+
+  return Math.min(sc,100);
+}
+
+function findStrains(){
+  if(!selEnv){alert('Please select a space environment first.');return;}
+  const strainType=document.getElementById('strainType').value;
+  const evidLevel=document.getElementById('evidLevel').value;
+
+  let results=STRAINS.map(s=>({...s,sc:scoreStrain(s,selEnv,selPurposes,strainType,evidLevel)}))
+    .filter(s=>s.sc>=0)
+    .sort((a,b)=>b.sc-a.sc)
+    .slice(0,10);
+
+  displayResults(results);
+}
+
+function displayResults(results){
+  const sec=document.getElementById('rsec');
+  const con=document.getElementById('rcon');
+  sec.classList.add('show');
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+
+  if(results.length===0){
+    con.innerHTML='<div class="nores">🔭 No strains matched these conditions. Try adjusting your environment or removing evidence filters.</div>';
+    return;
+  }
+
+  const isRes=curMode==='researcher';
+
+  con.innerHTML=results.map(s=>{
+    const pct=s.sc;
+    const bc=pct>=75?'hi':pct>=50?'md':'lo';
+
+    const traitBadges=[
+      s.prb?'⚗️ Perchlorate Reducer':null,
+      s.rad?'☢️ Radiation Resistant':null,
+      s.uv?'🌞 UV Resistant':null,
+      s.desic?'💧 Desiccation Tolerant':null,
+      s.cold?'❄️ Cold Active':null,
+      s.halo?'🧂 Halophile':null,
+      s.iaa?'🌱 IAA Producer':null,
+      s.nfix?'🌿 N₂ Fixer':null,
+      s.psol?'⚗️ P-Solubilizer':null,
+    ].filter(Boolean);
+
+    const evWidth=s.evidence==='high'?90:s.evidence==='medium'?55:25;
+    const evClass=s.evidence==='high'?'hi':s.evidence==='medium'?'md':'lo';
+
+    const engBox=s.eng_note&&isRes?
+      `<div style="background:rgba(155,93,229,0.08);border:1px solid rgba(155,93,229,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.88rem;color:var(--text);">
+        <strong style="color:var(--purple)">⚙️ Engineering:</strong> ${s.eng_note}
+      </div>`:'';
+
+    const analogBox=isRes?
+      `<div class="analog-box"><strong>🌍 Earth Analog:</strong> ${s.analog}</div>`:'';
+
+    const evBar=isRes?
+      `<div class="ev-row">
+        <span class="ev-label">Evidence Level</span>
+        <div class="ev-bar"><div class="ev-fill ${evClass}" style="width:${evWidth}%"></div></div>
+        <span style="font-size:0.82rem;color:var(--text2);font-family:'Space Mono',monospace;min-width:50px;">${s.evidence.toUpperCase()}</span>
+      </div>`:'';
+
+    const citeBox=isRes?
+      `<div class="rcite">📚 Literature: ${s.refs.join(', ')} — from verified 50-reference XenoBio database</div>`:'';
+
+    return `<div class="rcard">
+      <div class="rhdr">
+        <div>
+          <div class="rname">${s.sp}</div>
+          <div class="rstrain">Strain: ${s.st}</div>
+          <div class="rtype">${s.type==='engineered'?'⚙️ Engineered':'🌿 Natural'}</div>
+        </div>
+        <div class="sbadge ${bc}">${pct}%</div>
+      </div>
+      ${isRes?`<div class="res-row">${traitBadges.map(b=>`<span class="stbadge">${b}</span>`).join('')}</div>`:''}
+      <div class="tgrid">
+        <div class="tp ${s.prb?'y':'n'}">Perchlorate Reduction: ${s.prb?'✓':'✗'}</div>
+        <div class="tp ${s.rad?'y':'n'}">Radiation Resistance: ${s.rad?'✓':'✗'}</div>
+        <div class="tp ${s.uv?'y':'n'}">UV Tolerance: ${s.uv?'✓':'✗'}</div>
+        <div class="tp ${s.desic?'y':'n'}">Desiccation: ${s.desic?'✓':'✗'}</div>
+        <div class="tp ${s.cold?'y':'n'}">Cold Active: ${s.cold?'✓':'✗'}</div>
+        <div class="tp ${s.halo?'y':'n'}">Halophile: ${s.halo?'✓':'✗'}</div>
+        <div class="tp ${s.iaa?'y':'n'}">IAA (PGPR): ${s.iaa?'✓':'✗'}</div>
+        <div class="tp ${s.nfix?'y':'n'}">N₂ Fixation: ${s.nfix?'✓':'✗'}</div>
+      </div>
+      ${evBar}
+      ${analogBox}
+      ${engBox}
+      <div class="rwhy">${s.why}</div>
+      ${citeBox}
+    </div>`;
+  }).join('');
+}
+
+function buildFullTable(){
+  const tb=document.getElementById('fullTbody');
+  tb.innerHTML=STRAINS.map(s=>`<tr>
+    <td style="color:var(--white);font-style:italic">${s.sp}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:0.78rem">${s.st}</td>
+    <td style="color:${s.type==='engineered'?'var(--purple)':'var(--green)'}">${s.type==='engineered'?'Eng':'Nat'}</td>
+    <td class="${s.prb?'yt':'nt'}">${s.prb?'Y':'N'}</td>
+    <td class="${s.rad?'yt':'nt'}">${s.rad?'Y':'N'}</td>
+    <td class="${s.uv?'yt':'nt'}">${s.uv?'Y':'N'}</td>
+    <td class="${s.desic?'yt':'nt'}">${s.desic?'Y':'N'}</td>
+    <td class="${s.cold?'yt':'nt'}">${s.cold?'Y':'N'}</td>
+    <td class="${s.halo?'yt':'nt'}">${s.halo?'Y':'N'}</td>
+    <td class="${s.iaa?'yt':'nt'}">${s.iaa?'Y':'N'}</td>
+    <td class="${s.nfix?'yt':'nt'}">${s.nfix?'Y':'N'}</td>
+    <td class="${s.psol?'yt':'nt'}">${s.psol?'Y':'N'}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:0.78rem">${s.temp_min}°C to ${s.temp_max}°C</td>
+    <td style="font-size:0.82rem;color:var(--text2)">${s.analog}</td>
+    <td style="color:${s.evidence==='high'?'var(--green)':s.evidence==='medium'?'var(--cyan)':'var(--gold)'};font-family:'Space Mono',monospace;font-size:0.78rem">${s.evidence.toUpperCase()}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--text2)">${s.refs.join(' ')}</td>
+  </tr>`).join('');
+}
+
+init();
+</script>
+</body>
+</html>
